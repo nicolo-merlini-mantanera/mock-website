@@ -1,6 +1,6 @@
-import {flattenConnection} from '@shopify/hydrogen';
-import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import type {SitemapQuery} from 'storefrontapi.generated';
+import { flattenConnection } from '@shopify/hydrogen';
+import type { LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import type { SitemapQuery } from 'storefrontapi.generated';
 
 /**
  * the google limit is 50K, however, the storefront API
@@ -21,7 +21,7 @@ type Entry = {
 
 export async function loader({
   request,
-  context: {storefront},
+  context: { storefront },
 }: LoaderFunctionArgs) {
   const data = await storefront.query(SITEMAP_QUERY, {
     variables: {
@@ -31,15 +31,14 @@ export async function loader({
   });
 
   if (!data) {
-    throw new Response('No data found', {status: 404});
+    throw new Response('No data found', { status: 404 });
   }
 
-  const sitemap = generateSitemap({data, baseUrl: new URL(request.url).origin});
+  const sitemap = generateSitemap({ data, baseUrl: new URL(request.url).origin });
 
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml',
-
       'Cache-Control': `max-age=${60 * 60 * 24}`,
     },
   });
@@ -119,7 +118,7 @@ function generateSitemap({
     </urlset>`;
 }
 
-function renderUrlTag({url, lastMod, changeFreq, image}: Entry) {
+function renderUrlTag({ url, lastMod, changeFreq, image }: Entry) {
   const imageTag = image
     ? `<image:image>
         <image:loc>${image.url}</image:loc>

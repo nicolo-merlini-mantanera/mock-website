@@ -1,31 +1,45 @@
-import {defer, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {Await, useLoaderData, Link, type MetaFunction} from '@remix-run/react';
-import {Suspense} from 'react';
-import {Image, Money} from '@shopify/hydrogen';
+import { defer, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { Await, useLoaderData, Link, type MetaFunction } from '@remix-run/react';
+import { Suspense } from 'react';
+import { Image, Money, Storefront } from '@shopify/hydrogen';
 import type {
   FeaturedCollectionFragment,
   RecommendedProductsQuery,
 } from 'storefrontapi.generated';
+import LoadingCard from '~/components/LoadingCard';
 
 export const meta: MetaFunction = () => {
-  return [{title: 'Hydrogen | Home'}];
+  return [{ title: 'Mantanera Mock' }];
 };
 
-export async function loader({context}: LoaderFunctionArgs) {
-  const {storefront} = context;
-  const {collections} = await storefront.query(FEATURED_COLLECTION_QUERY);
-  const featuredCollection = collections.nodes[0];
-  const recommendedProducts = storefront.query(RECOMMENDED_PRODUCTS_QUERY);
+const getRecommendedProducts = async (storefront: Storefront<I18nLocale>) => {
+  await new Promise<void>((resolve, reject) => {
+    setTimeout(() => {
+      resolve()
+    }, 2000);
+  })
+  return storefront.query(RECOMMENDED_PRODUCTS_QUERY);
+}
 
-  return defer({featuredCollection, recommendedProducts});
+export async function loader({ context }: LoaderFunctionArgs) {
+  const { storefront } = context;
+
+  const { collections } = await storefront.query(FEATURED_COLLECTION_QUERY);
+
+  const featuredCollection = collections.nodes[0];
+  const recommendedProducts = getRecommendedProducts(storefront)
+  return defer({ featuredCollection, recommendedProducts });
 }
 
 export default function Homepage() {
   const data = useLoaderData<typeof loader>();
   return (
-    <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+    <div>
+      <Link to={"/"}>
+        <img src="/desktop_image.jpg" alt="gift_guide" />
+      </Link>
+      {/* <FeaturedCollection collection={data.featuredCollection} />
+      <RecommendedProducts products={data.recommendedProducts} /> */}
     </div>
   );
 }
@@ -36,6 +50,8 @@ function FeaturedCollection({
   collection: FeaturedCollectionFragment;
 }) {
   if (!collection) return null;
+  console.log(collection);
+
   const image = collection?.image;
   return (
     <Link
@@ -59,10 +75,15 @@ function RecommendedProducts({
 }) {
   return (
     <div className="recommended-products">
-      <h2>Recommended Products</h2>
-      <Suspense fallback={<div>Loading...</div>}>
+      <h2
+      >Recommended Products</h2>
+      <Suspense fallback={
+        <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10'>
+          {[1, 2, 3, 4].map(() => <LoadingCard />)}
+        </div>
+      }>
         <Await resolve={products}>
-          {({products}) => (
+          {({ products }) => (
             <div className="recommended-products-grid">
               {products.nodes.map((product) => (
                 <Link

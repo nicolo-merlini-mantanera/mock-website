@@ -1,21 +1,23 @@
-import {json, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
-import {useLoaderData, Link, type MetaFunction} from '@remix-run/react';
+import { json, redirect, type LoaderFunctionArgs } from '@shopify/remix-oxygen';
+import { useLoaderData, Link, type MetaFunction } from '@remix-run/react';
 import {
   Pagination,
   getPaginationVariables,
   Image,
   Money,
 } from '@shopify/hydrogen';
-import type {ProductItemFragment} from 'storefrontapi.generated';
-import {useVariantUrl} from '~/utils';
+import type { ProductItemFragment } from 'storefrontapi.generated';
+import { useVariantUrl } from '~/utils';
+import { NavArrowRight } from 'iconoir-react';
+import HomeLayout from '~/components/HomeLayout';
 
-export const meta: MetaFunction<typeof loader> = ({data}) => {
-  return [{title: `Hydrogen | ${data?.collection.title ?? ''} Collection`}];
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  return [{ title: `Hydrogen | ${data?.collection.title ?? ''} Collection` }];
 };
 
-export async function loader({request, params, context}: LoaderFunctionArgs) {
-  const {handle} = params;
-  const {storefront} = context;
+export async function loader({ request, params, context }: LoaderFunctionArgs) {
+  const { handle } = params;
+  const { storefront } = context;
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
@@ -24,8 +26,10 @@ export async function loader({request, params, context}: LoaderFunctionArgs) {
     return redirect('/collections');
   }
 
-  const {collection} = await storefront.query(COLLECTION_QUERY, {
-    variables: {handle, ...paginationVariables},
+  console.log('handle', handle);
+
+  const { collection } = await storefront.query(COLLECTION_QUERY, {
+    variables: { handle, ...paginationVariables },
   });
 
   if (!collection) {
@@ -33,18 +37,31 @@ export async function loader({request, params, context}: LoaderFunctionArgs) {
       status: 404,
     });
   }
-  return json({collection});
+  return json({ collection });
 }
 
 export default function Collection() {
-  const {collection} = useLoaderData<typeof loader>();
+  const { collection } = useLoaderData<typeof loader>();
+  console.log('collezione', collection);
 
   return (
-    <div className="collection">
-      <h1>{collection.title}</h1>
+    <HomeLayout>
+      <div className='flex gap-3'>
+        <p
+          className='underline hover:text-[#707070] cursor-pointer underline-offset-[6px] uppercase'
+        >Home</p>
+        <NavArrowRight
+          width={16}
+          height={16}
+          className='my-auto'
+        />
+        <p
+          className='underline hover:text-[#707070] cursor-pointer underline-offset-[6px] uppercase'
+        >{collection.title}</p>
+      </div>
       <p className="collection-description">{collection.description}</p>
       <Pagination connection={collection.products}>
-        {({nodes, isLoading, PreviousLink, NextLink}) => (
+        {({ nodes, isLoading, PreviousLink, NextLink }) => (
           <>
             <PreviousLink>
               {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
@@ -57,13 +74,13 @@ export default function Collection() {
           </>
         )}
       </Pagination>
-    </div>
+    </HomeLayout>
   );
 }
 
-function ProductsGrid({products}: {products: ProductItemFragment[]}) {
+function ProductsGrid({ products }: { products: ProductItemFragment[] }) {
   return (
-    <div className="products-grid">
+    <div className="grid grid-cols-4 gap-28">
       {products.map((product, index) => {
         return (
           <ProductItem
@@ -88,7 +105,6 @@ function ProductItem({
   const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
   return (
     <Link
-      className="product-item"
       key={product.id}
       prefetch="intent"
       to={variantUrl}

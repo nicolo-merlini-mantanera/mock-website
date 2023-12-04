@@ -1,4 +1,4 @@
-import {useNonce} from '@shopify/hydrogen';
+import { useNonce } from '@shopify/hydrogen';
 import {
   defer,
   type SerializeFrom,
@@ -17,11 +17,13 @@ import {
   isRouteErrorResponse,
   type ShouldRevalidateFunction,
 } from '@remix-run/react';
-import type {CustomerAccessToken} from '@shopify/hydrogen/storefront-api-types';
+import type { CustomerAccessToken } from '@shopify/hydrogen/storefront-api-types';
 import favicon from '../public/favicon.svg';
 import resetStyles from './styles/reset.css';
 import appStyles from './styles/app.css';
-import {Layout} from '~/components/Layout';
+import tailwindStyles from './styles/tailwind.css';
+
+import { Layout } from '~/components/Layout';
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -46,8 +48,9 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
 
 export function links() {
   return [
-    {rel: 'stylesheet', href: resetStyles},
-    {rel: 'stylesheet', href: appStyles},
+    { rel: 'stylesheet', href: resetStyles },
+    //{ rel: 'stylesheet', href: appStyles },
+    { rel: 'stylesheet', href: tailwindStyles },
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',
@@ -56,7 +59,7 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    { rel: 'icon', type: 'image/svg+xml', href: favicon },
   ];
 }
 
@@ -65,13 +68,13 @@ export const useRootLoaderData = () => {
   return root?.data as SerializeFrom<typeof loader>;
 };
 
-export async function loader({context}: LoaderFunctionArgs) {
-  const {storefront, session, cart} = context;
+export async function loader({ context }: LoaderFunctionArgs) {
+  const { storefront, session, cart } = context;
   const customerAccessToken = await session.get('customerAccessToken');
   const publicStoreDomain = context.env.PUBLIC_STORE_DOMAIN;
 
   // validate the customer access token is valid
-  const {isLoggedIn, headers} = await validateCustomerAccessToken(
+  const { isLoggedIn, headers } = await validateCustomerAccessToken(
     session,
     customerAccessToken,
   );
@@ -103,7 +106,7 @@ export async function loader({context}: LoaderFunctionArgs) {
       isLoggedIn,
       publicStoreDomain,
     },
-    {headers},
+    { headers },
   );
 }
 
@@ -192,7 +195,7 @@ async function validateCustomerAccessToken(
   let isLoggedIn = false;
   const headers = new Headers();
   if (!customerAccessToken?.accessToken || !customerAccessToken?.expiresAt) {
-    return {isLoggedIn, headers};
+    return { isLoggedIn, headers };
   }
 
   const expiresAt = new Date(customerAccessToken.expiresAt).getTime();
@@ -206,7 +209,7 @@ async function validateCustomerAccessToken(
     isLoggedIn = true;
   }
 
-  return {isLoggedIn, headers};
+  return { isLoggedIn, headers };
 }
 
 const MENU_FRAGMENT = `#graphql
