@@ -7,7 +7,13 @@ export default {
     "./components/**/*.{js,jsx,ts,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        'nero': '#090302',
+        'beige': '#c1bf84',
+        'rosso': '#a2332e'
+      },
+    },
   },
   plugins: [formsPlugin, typographyPlugin],
 };

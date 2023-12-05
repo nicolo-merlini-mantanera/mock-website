@@ -373,6 +373,12 @@ const PRODUCT_FRAGMENT = `#graphql
       name
       values
     }
+    images(first:2){
+      nodes{
+        url
+        altText
+      }
+    }
     selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions) {
       ...ProductVariant
     }

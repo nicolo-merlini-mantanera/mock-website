@@ -44,3 +44,24 @@ export function getVariantUrl({
 
   return path + (searchString ? '?' + searchParams.toString() : '');
 }
+
+
+//TODO mappa colori corretta
+export const colorMap: {name:string, cssColor:string}[] = [
+  {
+    name:"nero",
+    cssColor:"#090302"
+  },
+  {
+    name:"beige",
+    cssColor: "#f5f5dc"
+  },
+  {
+    name:"rosso",
+    cssColor: "#a2332e"
+  },
+  {
+    name:"bianco",
+    cssColor: "#ffffff"
+  }
+]
